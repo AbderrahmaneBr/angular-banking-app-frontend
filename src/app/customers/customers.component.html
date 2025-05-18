@@ -1,0 +1,70 @@
+<div class="container my-4">
+  <div class="row justify-content-center">
+    <div class="col-md-12">
+      <div class="mb-2 d-flex flex-row gap-2">
+        <button
+          class="btn btn-primary d-flex align-items-center gap-1"
+          [routerLink]="['/customers/add']"
+        >
+          <i class="bi bi-plus h5 mb-0" aria-hidden="true"></i>
+          Add Customer
+        </button>
+      </div>
+      <ng-container *ngIf="customers | async; else failureOrLoading">
+        <div *ngIf="searchFormGroup" class="mb-4">
+          <form
+            [formGroup]="searchFormGroup"
+            (ngSubmit)="findCustomers(searchFormGroup.value.keyword)"
+          >
+            <div class="input-group">
+              <span class="input-group-text">Keyword</span>
+              <input
+                type="text"
+                formControlName="keyword"
+                class="form-control"
+                placeholder="Enter customer name or email"
+              />
+              <button class="btn btn-info" type="submit">Search</button>
+            </div>
+          </form>
+        </div>
+
+        <table class="table table-bordered text-center">
+          <thead class="table-light">
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Name</th>
+              <th scope="col">E-mail</th>
+              <th scope="col">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let c of customers | async">
+              <th scope="row">{{ c.id }}</th>
+              <td>{{ c.name }}</td>
+              <td>{{ c.email }}</td>
+              <td>
+                <button
+                  class="btn btn-danger"
+                  (click)="handleDeleteCustomer(c.id)"
+                >
+                  <i class="bi bi-trash3-fill"></i>
+                </button>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      </ng-container>
+
+      <ng-template #failureOrLoading>
+        <p class="text-danger text-center" *ngIf="errorMessage; else loading">
+          {{ errorMessage }}
+        </p>
+
+        <ng-template #loading>
+          <p class="text-info text-center" *ngIf="!errorMessage">Loading...</p>
+        </ng-template>
+      </ng-template>
+    </div>
+  </div>
+</div>

@@ -1,0 +1,131 @@
+<div class="container my-4">
+  <div class="row justify-content-center">
+    <div class="col-md-12">
+      <div class="mb-2 d-flex flex-row gap-2"></div>
+
+      <!-- Search Form -->
+      <div *ngIf="searchFormGroup" class="mb-4">
+        <form
+          [formGroup]="searchFormGroup"
+          (ngSubmit)="findAccount(searchFormGroup.value.accountId)"
+        >
+          <div class="input-group">
+            <span class="input-group-text">Account ID</span>
+            <input
+              type="text"
+              formControlName="accountId"
+              class="form-control"
+              placeholder="Enter account id"
+            />
+            <button class="btn btn-info" type="submit">Search</button>
+          </div>
+        </form>
+      </div>
+
+      <!-- Error Message -->
+      <p class="text-danger text-center" *ngIf="errorMessage">
+        {{ errorMessage }}
+      </p>
+
+      <!-- Loading Spinner -->
+      <div class="d-flex justify-content-center my-3" *ngIf="isLoading">
+        <div class="spinner-border text-info" role="status">
+          <span class="visually-hidden">Loading...</span>
+        </div>
+      </div>
+
+      <!-- Account Details -->
+      <div *ngIf="accounts | async as accountDetails">
+        <div>
+          <label>Account ID: </label>
+          <p class="text-info font-weight-bold">
+            {{ accountDetails.accountId }}
+          </p>
+        </div>
+        <div>
+          <label>Balance: </label>
+          <p class="text-info font-weight-bold">
+            {{ accountDetails.balance }}
+          </p>
+        </div>
+
+        <!-- Transactions Table -->
+        <table class="table table-bordered text-center">
+          <thead class="table-light">
+            <tr>
+              <th scope="col">#</th>
+              <th scope="col">Amount</th>
+              <th scope="col">Description</th>
+              <th scope="col">Type</th>
+              <th scope="col">Date</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr *ngFor="let c of accountDetails.accountOperations">
+              <th scope="row">{{ c.id }}</th>
+              <td>{{ c.amount }}</td>
+              <td>{{ c.description }}</td>
+              <td>{{ c.type }}</td>
+              <td>{{ c.operationDate }}</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Pagination -->
+        <div *ngIf="accountDetails.currentPage !== undefined">
+          <nav class="my-3">
+            <ul class="pagination justify-content-center">
+              <li
+                class="page-item"
+                [class.disabled]="accountDetails.currentPage === 0"
+              >
+                <button
+                  class="page-link"
+                  (click)="goToPage(accountDetails.currentPage - 1)"
+                >
+                  Previous
+                </button>
+              </li>
+
+              <li
+                class="page-item"
+                *ngFor="
+                  let page of [].constructor(accountDetails.totalPage);
+                  let i = index
+                "
+                [class.active]="i === accountDetails.currentPage"
+              >
+                <button class="page-link" (click)="goToPage(i)">
+                  {{ i + 1 }}
+                </button>
+              </li>
+
+              <li
+                class="page-item"
+                [class.disabled]="
+                  accountDetails.currentPage === accountDetails.totalPage - 1
+                "
+              >
+                <button
+                  class="page-link"
+                  (click)="goToPage(accountDetails.currentPage + 1)"
+                >
+                  Next
+                </button>
+              </li>
+            </ul>
+          </nav>
+        </div>
+      </div>
+
+      <!-- Add Operation Button -->
+      <button
+        class="btn btn-primary d-flex align-items-center gap-1"
+        [routerLink]="['/accounts/add-operation']"
+      >
+        <i class="bi bi-plus h5 mb-0" aria-hidden="true"></i>
+        Add Operation
+      </button>
+    </div>
+  </div>
+</div>
