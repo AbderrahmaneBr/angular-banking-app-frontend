@@ -1,5 +1,5 @@
 import { AsyncPipe, NgFor, NgIf } from '@angular/common';
-import { Component } from '@angular/core';
+import { Component, OnInit } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { Observable, of } from 'rxjs';
@@ -12,13 +12,14 @@ import { AccountService } from '../services/account.service';
   styleUrl: './accounts.component.css',
   imports: [NgFor, AsyncPipe, NgIf, ReactiveFormsModule, RouterLink],
 })
-export class AccountsComponent {
+export class AccountsComponent implements OnInit {
   accounts?: Observable<AccountDetails>;
   errorMessage?: string;
   isLoading: boolean = false;
   searchFormGroup?: FormGroup;
   private currentAccountId: string = '';
   private currentPage: number = 0;
+  isAdmin: boolean = false;
 
   constructor(
     private router: Router,
@@ -56,5 +57,15 @@ export class AccountsComponent {
     this.searchFormGroup = this.fb.group({
       accountId: this.fb.control(''),
     });
+
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        this.isAdmin = payload.scope === 'ROLE_ADMIN';
+      } catch (err) {
+        console.error('Failed to decode token:', err);
+      }
+    }
   }
 }

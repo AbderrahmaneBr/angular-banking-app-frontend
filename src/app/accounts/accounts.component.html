@@ -34,6 +34,14 @@
         </div>
       </div>
 
+      <!-- Info Message -->
+      <div
+        class="d-flex justify-content-center my-3"
+        *ngIf="searchFormGroup?.value.accountId === '' && !accounts"
+      >
+        <span class="">Please provide an Account Id.</span>
+      </div>
+
       <!-- Account Details -->
       <div *ngIf="accounts | async as accountDetails">
         <div>
@@ -120,6 +128,7 @@
 
       <!-- Add Operation Button -->
       <button
+        *ngIf="isAdmin"
         class="btn btn-primary d-flex align-items-center gap-1"
         [routerLink]="['/accounts/add-operation']"
       >

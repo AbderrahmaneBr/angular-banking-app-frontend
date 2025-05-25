@@ -1,64 +1,50 @@
-import { HttpClient } from '@angular/common/http';
 import { Component, OnInit } from '@angular/core';
-import { CustomerService } from '../services/customer.service';
+import { CommonModule, AsyncPipe } from '@angular/common';
+import { RouterLink } from '@angular/router';
+import { Observable } from 'rxjs';
 import { Customer } from '../model/customer.model';
-import { Observable, of } from 'rxjs';
-import { AsyncPipe, JsonPipe, NgFor, NgIf } from '@angular/common';
-import {
-  FormBuilder,
-  FormGroup,
-  NgForm,
-  ReactiveFormsModule,
-} from '@angular/forms';
-import { Router, RouterLink } from '@angular/router';
+import { CustomerService } from '../services/customer.service';
 
 @Component({
   selector: 'app-customers',
-  imports: [NgFor, AsyncPipe, NgIf, ReactiveFormsModule, RouterLink],
+  standalone: true,
+  imports: [CommonModule, RouterLink, AsyncPipe],
   templateUrl: './customers.component.html',
-  styleUrl: './customers.component.css',
 })
 export class CustomersComponent implements OnInit {
-  customers?: Observable<Customer[]>;
-  errorMessage?: string;
-  searchFormGroup?: FormGroup;
+  customers$: Observable<Customer[]>;
+  isAdmin: boolean = false;
+  errorMessage: string = '';
 
-  constructor(
-    private router: Router,
-    private customerService: CustomerService,
-    private fb: FormBuilder
-  ) {}
+  constructor(private customerService: CustomerService) {
+    // Initialize the customers$ Observable
+    this.customers$ = this.customerService.findCustomers('');
+  }
 
-  findCustomers(keyword: string) {
-    this.customerService.findCustomers(keyword).subscribe({
-      next: (data: Customer[]) => {
-        this.customers = of(data);
-      },
-      error: (err) => {
-        console.error(err);
-        this.errorMessage = err;
-        throw err;
-      },
-    });
+  ngOnInit() {
+    const token = localStorage.getItem('token');
+    if (token) {
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        this.isAdmin = payload.scope === 'ROLE_ADMIN';
+      } catch (err) {
+        console.error('Failed to decode token:', err);
+      }
+    }
   }
 
   handleDeleteCustomer(customerId: number) {
     if (!confirm('Are you sure?')) return;
+
     this.customerService.deleteCustomer(customerId).subscribe({
       next: () => {
-        window.location.reload();
+        // Refresh the customers list after deletion
+        this.customers$ = this.customerService.findCustomers('');
       },
       error: (err) => {
         console.error(err);
-        throw err;
+        this.errorMessage = 'Failed to delete customer';
       },
     });
-  }
-
-  ngOnInit(): void {
-    this.searchFormGroup = this.fb.group({
-      keyword: this.fb.control(''),
-    });
-    this.findCustomers('');
   }
 }

@@ -14,6 +14,12 @@ export class CustomerService {
     return this.http.get<Customer[]>(`${environment.apiUrl}/customers`);
   }
 
+  public getCustomerById(customerId: number): Observable<Customer> {
+    return this.http.get<Customer>(
+      `${environment.apiUrl}/customers/${customerId}`
+    );
+  }
+
   public findCustomers(keyword: string): Observable<Customer[]> {
     return this.http.get<Customer[]>(
       `${environment.apiUrl}/customers/search?keyword=${keyword}`

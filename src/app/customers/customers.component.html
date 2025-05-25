@@ -1,70 +1,54 @@
 <div class="container my-4">
   <div class="row justify-content-center">
     <div class="col-md-12">
-      <div class="mb-2 d-flex flex-row gap-2">
+      <!-- Only show add button for admins -->
+      <div class="mb-2 d-flex flex-row gap-2" *ngIf="isAdmin">
         <button
           class="btn btn-primary d-flex align-items-center gap-1"
           [routerLink]="['/customers/add']"
         >
-          <i class="bi bi-plus h5 mb-0" aria-hidden="true"></i>
+          <i class="bi bi-plus h5 mb-0"></i>
           Add Customer
         </button>
       </div>
-      <ng-container *ngIf="customers | async; else failureOrLoading">
-        <div *ngIf="searchFormGroup" class="mb-4">
-          <form
-            [formGroup]="searchFormGroup"
-            (ngSubmit)="findCustomers(searchFormGroup.value.keyword)"
-          >
-            <div class="input-group">
-              <span class="input-group-text">Keyword</span>
-              <input
-                type="text"
-                formControlName="keyword"
-                class="form-control"
-                placeholder="Enter customer name or email"
-              />
-              <button class="btn btn-info" type="submit">Search</button>
-            </div>
-          </form>
-        </div>
 
-        <table class="table table-bordered text-center">
-          <thead class="table-light">
-            <tr>
-              <th scope="col">#</th>
-              <th scope="col">Name</th>
-              <th scope="col">E-mail</th>
-              <th scope="col">Actions</th>
-            </tr>
-          </thead>
-          <tbody>
-            <tr *ngFor="let c of customers | async">
-              <th scope="row">{{ c.id }}</th>
-              <td>{{ c.name }}</td>
-              <td>{{ c.email }}</td>
-              <td>
+      <table class="table table-bordered text-center">
+        <thead class="table-light">
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Name</th>
+            <th scope="col">E-mail</th>
+            <th scope="col">Actions</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr *ngFor="let customer of customers$ | async">
+            <td>{{ customer.id }}</td>
+            <td>{{ customer.name }}</td>
+            <td>{{ customer.email }}</td>
+            <td>
+              <div class="d-flex justify-content-center gap-2">
+                <!-- Only show delete button for admins -->
                 <button
-                  class="btn btn-danger"
-                  (click)="handleDeleteCustomer(c.id)"
+                  *ngIf="isAdmin"
+                  class="btn btn-danger btn-sm"
+                  (click)="handleDeleteCustomer(customer.id)"
                 >
-                  <i class="bi bi-trash3-fill"></i>
+                  <i class="bi bi-trash"></i>
+                  Delete
                 </button>
-              </td>
-            </tr>
-          </tbody>
-        </table>
-      </ng-container>
-
-      <ng-template #failureOrLoading>
-        <p class="text-danger text-center" *ngIf="errorMessage; else loading">
-          {{ errorMessage }}
-        </p>
-
-        <ng-template #loading>
-          <p class="text-info text-center" *ngIf="!errorMessage">Loading...</p>
-        </ng-template>
-      </ng-template>
+                <button
+                  class="btn btn-primary btn-sm"
+                  [routerLink]="['/customers', customer.id]"
+                >
+                  <i class="bi bi-eye"></i>
+                  View
+                </button>
+              </div>
+            </td>
+          </tr>
+        </tbody>
+      </table>
     </div>
   </div>
 </div>
