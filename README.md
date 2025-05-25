@@ -78,6 +78,21 @@ Pour exécuter les tests unitaires :
 ng test
 ```
 
+## Guards
+
+Les guards sont utilisés pour contrôler l'accès aux routes. Ils permettent d'autoriser ou de bloquer la navigation vers une page en fonction de certaines conditions (comme l'authentification, les rôles, ...).
+
+Dans notre application on a utilisé les guards `Auth` et `Admin` :
+
+- Le guard `Auth` permet de vérifier si l'utilisateur est connécté.
+- Le guard `Admin` vérifie si l'utilisateur est un admin ou pas.
+
+## Interceptors
+
+Les interceptors interceptent toutes les requêtes HTTP sortantes et les réponses entrantes. Ils permettent de modifier les requêtes (ajouter des headers, tokens JWT, ...) ou de gérer les erreurs globalement (ex : erreurs 401, 403, 500...).
+
+Dans l'application on a utilisé l'intercepteur `Auth` pour ajouter le **Bearer token** à chaque requête envoyée de la part du client.
+
 ---
 
 Ce projet met en avant les bonnes pratiques Angular pour une application bancaire moderne, modulaire et maintenable.
